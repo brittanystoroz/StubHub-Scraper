@@ -15,32 +15,7 @@ jOut = None
 totalResults = 0
 
 # List of cities to scrape
-cities = { ('Austin+San+Antonio','TX'),
-			('New York','NY'),
-			('San Francicso','CA'),
-			('Los Angeles','CA'),
-			('Chicago','IL'),
-			('Houston','TX'),
-			('Phoenix','AZ'),
-			('Philadelphia','PA'),
-			('San Diego','CA'),
-			('Dallas','TX'),
-			('San Jose','CA'),
-			('Detroit','MI'),
-			('Jacksonville','FL'),
-			('Indianapolis','IN'),
-			('Columbus','OH'),
-			('Baltimore','MD'),
-			('Charlotte','NC'),
-			('Nashville', 'TN'),
-			('New Orleans, LA'),
-			('Portland','OR'),
-			('Minneapolis','MN'),
-			('Boston','MA'),
-			('Seattle','WA'),
-			('Miami','FL'),
-			('Cleveland','OH')
-			}
+cities = {('New York','NY')}
 
 
 #outputs data in json and csv format
@@ -50,7 +25,7 @@ def output(eventName, time, day, date, month, venue, city, price, ticketsLeft):
 	cOut.write(eventName + "," + time + "," + day + "," + date + "," + month + "," + venue + "," + city + "," + price + "," + ticketsLeft + "\n")
 
 #function which finds the data from the first two columns of a page result
-def soupify(tr, tag, attr1, attr2): 
+def soupify(tr, tag, attr1, attr2):
 	data = tr.find(tag, attrs = {attr1:attr2})
 	soup = BeautifulSoup(str(data))
 	output = soup.find(text=True)
@@ -68,7 +43,7 @@ def soupify2(tr,tag,attr1,attr2):
 
 #Method to parse each page's results
 def parseResultsPage(soup):
-	
+
 	#Find table in page, visit each row
 	table = soup.find('table')
 	rows = table.findAll('tr')
@@ -84,7 +59,7 @@ def parseResultsPage(soup):
 		#check if this is a valid row
 		if (day != "None"):
 			venue, city, time = soupify2(tr,'td','class','blackFont eventLocation')
-			
+
 			#check if there are actually tickets for sale
 			if (price != "None"):
 				data = tr.findAll("td",text=True)
@@ -98,7 +73,7 @@ def parseResultsPage(soup):
 
 			output(eventName,time,day,numDay,month,venue,city,price,ticketsLeft)
 
-		
+
 
 #Calculates total number of events in a city, visits each results page, and returns event count
 def pageNavigation(BASEURL, BASEURL1, BASEURL2):
@@ -117,9 +92,9 @@ def pageNavigation(BASEURL, BASEURL1, BASEURL2):
 		parseResultsPage(soup)
 	return results
 
-#fucntion that constructs each city's URL 
+#fucntion that constructs each city's URL
 def constructURL(city, state):
-	BASEURL1 = "http://www.stubhub.com/search/doSearch?searchStr=" + city.replace(" ","%20") + ",%20" + str(state) + "&searchMode=event&rows=100&start=" 
+	BASEURL1 = "http://www.stubhub.com/search/doSearch?searchStr=" + city.replace(" ","%20") + ",%20" + str(state) + "&searchMode=event&rows=100&start="
 	BASEURL2 = "&pageNumber=1&resultsPerPage=50&searchMode=event&start=0&rows=50&geo_exp=1"
 	startURL = BASEURL1 + '0' + BASEURL2
 	startURL = quote(startURL, safe="%/:=&?~#+!$,;'@()*[]")
